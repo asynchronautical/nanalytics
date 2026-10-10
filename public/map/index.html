@@ -46,11 +46,19 @@
   .legend div { text-align: center; font-size: 12px; color: var(--muted); }
   .legend img { width: 100%; max-width: 56px; height: auto; display: block; margin: 0 auto 2px; }
   .legend .n { font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .cap { display: flex; align-items: center; gap: 12px; margin-top: 14px; font-size: 14px; color: var(--muted); }
-  .cap input { width: 220px; accent-color: var(--accent); }
+  .reveal { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .reveal input { width: 100%; accent-color: var(--accent); }
+  .revealout { font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .revealout .m { color: var(--muted); margin-left: 10px; }
+  .hero { display: grid; grid-template-columns: 180px 1fr; gap: 20px; align-items: center; margin-top: 20px; padding: 8px 4px; }
+  .hero img { width: 180px; height: 180px; }
+  .herohead { font-size: 34px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 6px; line-height: 1.1; }
+  .herotext { margin: 0; font-size: 18px; max-width: 48ch; }
+  .dim { opacity: 0; }
+  image { transition: opacity .25s ease; }
   .notes { color: var(--muted); font-size: 13px; margin-top: 18px; line-height: 1.55; }
   .notes a { color: inherit; }
-  @media (max-width: 640px) { h1 { font-size: 24px; } .formula { font-size: 15px; } .legend { grid-template-columns: repeat(5, 1fr); } }
+  @media (max-width: 640px) { h1 { font-size: 24px; } .formula { font-size: 15px; } .legend { grid-template-columns: repeat(5, 1fr); } .hero { grid-template-columns: 110px 1fr; } .hero img { width: 110px; height: 110px; } .herohead { font-size: 26px; } .reveal { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -58,7 +66,7 @@
   <header>
     <div>
       <h1>How fresh is your district?</h1>
-      <p class="lede">All 435 U.S. House districts for the 2026 midterms, one banana each. Green means the district is close enough that every vote counts. Black means the outcome was settled when the lines were drawn. Hover a banana.</p>
+      <p class="lede">All 435 U.S. House districts for the 2026 midterms, one banana each. Green means the district is close enough that every vote counts. Black means the outcome was settled when the lines were drawn. You're seeing the green ones first. Drag the slider to see the rest.</p>
     </div>
     <button id="themebtn" type="button">dark</button>
   </header>
@@ -66,14 +74,25 @@
   <div class="panel mapwrap">
     <svg id="map" viewBox="45 -5 760 700" role="img" aria-label="Hex cartogram of 435 congressional districts, each shown as a banana at its ripeness stage"></svg>
     <div class="pop" id="pop"></div>
+    <div class="reveal">
+      <input type="range" id="reveal" min="1" max="10" step="1" value="1" aria-label="How many ripeness stages to show">
+      <div class="revealout"><span id="revealn"></span><span id="revealhint" class="m">Drag right to see the rest.</span></div>
+    </div>
   </div>
+
+  <section class="hero">
+    <img id="heroimg" alt="A green banana">
+    <div>
+      <p class="herohead"><span id="greencount">11</span> of 435 districts</p>
+      <p class="herotext">A green banana means people have an actual choice. The rest were decided, to varying degrees, when the lines were drawn.</p>
+    </div>
+  </section>
 
   <section class="panel eq">
     <h2>The rule</h2>
     <p class="formula">stage = 1 + round( 9 × min(|margin|, <b id="capv">20</b>) / <b id="capv2">20</b> )</p>
     <p class="where">margin = Harris minus Trump, 2024, counted inside the district as it is drawn for 2026. Stage 1 is green, stage 10 is black. Anything past a <span id="capv3">20</span>-point lean is treated as fully gone.</p>
     <div class="legend" id="legend"></div>
-    <div class="cap"><label for="cap">Try a different cap</label><input type="range" id="cap" min="10" max="40" step="1" value="20"><span id="capout"></span></div>
     <p class="notes">
       This is a structural measure. It says nothing about who is running, who has money, or what the national mood is. It asks one question: before any campaign, how far from a coin flip is this district? Expert handicappers answer a different question: who will win.
       <br><br>
@@ -90,7 +109,8 @@
   const img = (stage, size) => `/v1/${theme}stages/${size}/${stage}.webp`;
 
   const data = await (await fetch('data.json')).json();
-  let CAP = data.cap;
+  const CAP = data.cap;
+  let REVEAL = 1;
   const stageFor = m => 1 + Math.round(9 * Math.min(Math.abs(m), CAP) / CAP);
 
   const svg = document.getElementById('map'), NS = 'http://www.w3.org/2000/svg';
@@ -102,7 +122,7 @@
 
   const pop = document.getElementById('pop'), wrap = svg.parentElement;
   const fmtMargin = m => m === 0 ? 'Even' : (m > 0 ? `Harris +${m}` : `Trump +${-m}`);
-  const images = new Map();
+  const images = new Map(), cells = new Map();
   for (const d of data.districts) {
     const p = document.createElementNS(NS, 'path'); p.setAttribute('class', 'cell'); p.setAttribute('d', pathd(d.rings)); gC.append(p);
     // banana sized to the district's bounding box
@@ -112,7 +132,7 @@
     const im = document.createElementNS(NS, 'image');
     im.setAttribute('width', sz); im.setAttribute('height', sz);
     im.setAttribute('x', d.c[0] - sz / 2); im.setAttribute('y', d.c[1] - sz / 2);
-    gB.append(im); images.set(d.id, im);
+    gB.append(im); images.set(d.id, im); cells.set(d.id, p);
     const show = (ev) => {
       const st = stageFor(d.margin);
       const note = d.id.startsWith('MO-') ? '<br><span class="m">* Missouri: 2022 lines, by court order</span>' : '';
@@ -136,13 +156,17 @@
   const legend = document.getElementById('legend');
   function render() {
     const counts = new Array(11).fill(0);
-    for (const d of data.districts) { const st = stageFor(d.margin); counts[st]++; images.get(d.id).setAttribute('href', img(st, 64)); }
+    for (const d of data.districts) { const st = stageFor(d.margin); counts[st]++; const im = images.get(d.id); im.setAttribute('href', img(st, 64)); im.classList.toggle('dim', st > REVEAL); cells.get(d.id).style.pointerEvents = st > REVEAL ? 'none' : ''; }
+    const shown = counts.slice(1, REVEAL + 1).reduce((a, b) => a + b, 0);
+    document.getElementById('revealn').textContent = REVEAL >= 10 ? 'All 435 districts' : `${shown} of 435 districts (stage${REVEAL > 1 ? 's 1 to ' + REVEAL : ' 1'})`;
+    document.getElementById('revealhint').style.display = REVEAL >= 10 ? 'none' : '';
+    document.getElementById('greencount').textContent = counts[1];
+    document.getElementById('heroimg').src = img(1, 256);
     legend.innerHTML = '';
     for (let s = 1; s <= 10; s++) legend.insertAdjacentHTML('beforeend', `<div><img src="${img(s, 64)}" alt="stage ${s}"><div class="n">${counts[s]}</div>${SLUGS[s-1]}</div>`);
     for (const id of ['capv','capv2','capv3']) document.getElementById(id).textContent = CAP;
-    document.getElementById('capout').textContent = `${CAP} points → ${counts[1]} green, ${counts[10]} black of 435`;
   }
-  document.getElementById('cap').addEventListener('input', e => { CAP = +e.target.value; render(); });
+  document.getElementById('reveal').addEventListener('input', e => { REVEAL = +e.target.value; render(); });
 
   function applyTheme(dark) { root.dataset.theme = dark ? 'dark' : 'light'; theme = dark ? 'dark/' : ''; btn.textContent = dark ? 'light' : 'dark'; render(); }
   btn.addEventListener('click', () => applyTheme(root.dataset.theme !== 'dark'));
