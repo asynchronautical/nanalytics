@@ -1,0 +1,8 @@
+name = "nanalytics"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+# Static files are served first; anything without a matching file falls through to src/index.js

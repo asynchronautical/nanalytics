@@ -1,0 +1,13 @@
+{
+  "name": "nanalytics",
+  "version": "1.0.0-draft",
+  "description": "A ripening banana as a status glyph. 35 photographic frames, 10 named stages, CC0.",
+  "license": "MIT",
+  "type": "module",
+  "files": ["public/v1", "README.md", "LICENSE", "LICENSE-IMAGES"],
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": { "wrangler": "^4" }
+}

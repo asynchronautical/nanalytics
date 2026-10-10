@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nanalytics demo</title>
+<style>
+  :root {
+    --bg: #f6f3ee; --panel: #ffffff; --ink: #1d1a16; --muted: #6b655c; --line: #e6e0d6;
+    --accent: #8a6d1f; --bad: #a33a2a; --ok: #3b6b3a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17161a; --panel: #211f24; --ink: #ece7df; --muted: #9d968b; --line: #332f36;
+      --accent: #d9b44a; --bad: #e07461; --ok: #86b985;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17161a; --panel: #211f24; --ink: #ece7df; --muted: #9d968b; --line: #332f36;
+    --accent: #d9b44a; --bad: #e07461; --ok: #86b985;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 32px 16px 64px; }
+  main { max-width: 1040px; margin: 0 auto; }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .lede { color: var(--muted); margin: 0 0 32px; max-width: 60ch; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 12px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 9px 6px; border-top: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; border-top: 0; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  td.num.bad { color: var(--bad); font-weight: 600; }
+  td.num.ok { color: var(--ok); }
+  td.glyph { text-align: right; }
+  td.glyph img { height: 36px; width: 36px; object-fit: contain; vertical-align: middle; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 14px; }
+  .strip { margin-top: 28px; }
+  .strip .row { display: flex; gap: 0; align-items: flex-end; }
+  .strip .row img { width: calc(100% / 35); max-width: 28px; height: auto; }
+  .play { margin-top: 24px; display: grid; grid-template-columns: 160px 1fr; gap: 20px; align-items: center; }
+  .play img { width: 160px; height: 160px; max-width: none; }
+  .play input[type=range] { width: 100%; accent-color: var(--accent); }
+  .play .out { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; margin-top: 6px; }
+  #themebtn { float: right; font: inherit; font-size: 13px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); cursor: pointer; }
+  code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--line); padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Same dashboard, twice <button id="themebtn" type="button">dark</button></h1>
+  <p class="lede">Left: hours since each data source last refreshed, against its SLA. Right: the same numbers, mapped to a ripening banana. The numbers are still in the system. Only the reading changed.</p>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>With numbers</h2>
+      <table id="numtable"><thead><tr><th>Source</th><th style="text-align:right">Age (h)</th><th style="text-align:right">SLA (h)</th><th style="text-align:right">% of SLA</th></tr></thead><tbody></tbody></table>
+      <p class="note">Red at 100% of SLA. Which is a line somebody picked.</p>
+    </section>
+    <section class="panel">
+      <h2>With bananas</h2>
+      <table id="bantable"><thead><tr><th>Source</th><th style="text-align:right">Freshness</th></tr></thead><tbody></tbody></table>
+      <p class="note">No threshold. You decide when it's too far gone.</p>
+    </section>
+  </div>
+
+  <section class="panel strip">
+    <h2>The 35 frames</h2>
+    <div class="row" id="strip"></div>
+    <div class="play">
+      <img id="playimg" alt="">
+      <div>
+        <input type="range" id="slider" min="0" max="1" step="0.01" value="0.4">
+        <div class="out" id="playout"></div>
+      </div>
+    </div>
+    <p class="note">On the hosted service the same thing is one URL: <code>/v1/banana?value=0.4</code></p>
+  </section>
+</main>
+<script>
+  // Mirrors src/index.js so the demo works as static files, no Worker needed.
+  const STAGE_LAST_FRAME = [4, 6, 8, 9, 10, 11, 16, 22, 28, 35];
+  const SLUGS = ['green','breaking','turning','yellow-green','ripe','yellow','flecked','spotted','brown','black'];
+  const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+  const frameFor = t => clamp(Math.round(t * 34) + 1, 1, 35);
+  const stageFor = f => STAGE_LAST_FRAME.findIndex(l => f <= l) + 1;
+  let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark/' : '';
+  const stageUrl = (n, size=128) => `../v1/${theme}stages/${size}/${n}.webp`;
+  const frameUrl = (f, size=128) => `../v1/${theme}frames/${size}/${String(f).padStart(2,'0')}.webp`;
+
+  const sources = [
+    ['HubSpot deals',           0.5,  4],
+    ['Zendesk tickets',         2,    24],
+    ['Canvas LTI launches',     31,   24],
+    ['Active user counts',      6*24, 7*24],
+    ['QuickBooks receivables',  19*24, 30*24],
+    ['Scholar alerts',          44*24, 14*24],
+    ['Campaign sends',          null, 24],
+    ['Status page uptime',      3,    1],
+  ];
+  const nb = document.querySelector('#numtable tbody'), bb = document.querySelector('#bantable tbody');
+  function render() {
+  nb.innerHTML = ''; bb.innerHTML = ''; strip.innerHTML = '';
+  for (const [name, age, sla] of sources) {
+    const pct = age === null ? null : age / sla;
+    const cls = pct === null ? '' : pct >= 1 ? 'bad' : pct < 0.5 ? 'ok' : '';
+    nb.insertAdjacentHTML('beforeend', `<tr><td>${name}</td><td class="num">${age === null ? '—' : fmt(age)}</td><td class="num">${fmt(sla)}</td><td class="num ${cls}">${pct === null ? 'n/a' : Math.round(pct*100) + '%'}</td></tr>`);
+    let src, alt;
+    if (pct === null) { src = stageUrl('unknown'); alt = 'Banana, status unknown'; }
+    else { const f = frameFor(clamp(pct, 0, 1)); const s = stageFor(f); src = frameUrl(f); alt = `Banana, stage ${s} of 10 (${SLUGS[s-1]})`; }
+    bb.insertAdjacentHTML('beforeend', `<tr><td>${name}</td><td class="glyph"><img src="${src}" alt="${alt}" title="${alt}"></td></tr>`);
+  }
+  for (let f = 1; f <= 35; f++) strip.insertAdjacentHTML('beforeend', `<img src="${frameUrl(f, 64)}" alt="frame ${f}">`);
+  update();
+  }
+  function fmt(h) { return h >= 48 ? Math.round(h/24) + 'd' : h; }
+  const strip = document.getElementById('strip');
+
+  const slider = document.getElementById('slider'), img = document.getElementById('playimg'), out = document.getElementById('playout');
+  function update() {
+    const t = parseFloat(slider.value), f = frameFor(t), s = stageFor(f);
+    img.src = frameUrl(f, 256); img.alt = `Banana, frame ${f} of 35, stage ${s} of 10 (${SLUGS[s-1]})`;
+    out.textContent = `value ${t.toFixed(2)}  ->  frame ${f}/35, stage ${s}/10 "${SLUGS[s-1]}"`;
+  }
+  slider.addEventListener('input', update);
+  const root = document.documentElement, btn = document.getElementById('themebtn');
+  function applyTheme(dark) { root.dataset.theme = dark ? 'dark' : 'light'; theme = dark ? 'dark/' : ''; btn.textContent = dark ? 'light' : 'dark'; render(); }
+  btn.addEventListener('click', () => applyTheme(root.dataset.theme !== 'dark'));
+  applyTheme(theme === 'dark/');
+</script>
+</body>
+</html>
