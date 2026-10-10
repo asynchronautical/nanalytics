@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How fresh is your district?</title>
+<style>
+  :root {
+    --bg: #f6f3ee; --panel: #ffffff; --ink: #1d1a16; --muted: #6b655c; --line: #e6e0d6;
+    --accent: #8a6d1f; --state: #cfc7ba; --cell: rgba(0,0,0,0.035); --cellhover: rgba(138,109,31,0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17161a; --panel: #211f24; --ink: #ece7df; --muted: #9d968b; --line: #332f36;
+      --accent: #d9b44a; --state: #3d3942; --cell: rgba(255,255,255,0.035); --cellhover: rgba(217,180,74,0.22);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17161a; --panel: #211f24; --ink: #ece7df; --muted: #9d968b; --line: #332f36;
+    --accent: #d9b44a; --state: #3d3942; --cell: rgba(255,255,255,0.035); --cellhover: rgba(217,180,74,0.22);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 28px 16px 64px; }
+  main { max-width: 1100px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .lede { color: var(--muted); margin: 0 0 20px; max-width: 64ch; }
+  #themebtn { font: inherit; font-size: 13px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .mapwrap { position: relative; }
+  svg { width: 100%; height: auto; display: block; }
+  .cell { fill: var(--cell); stroke: none; cursor: default; }
+  .cell:hover, .cell.active { fill: var(--cellhover); }
+  .state { fill: none; stroke: var(--state); stroke-width: 1.2; pointer-events: none; }
+  image { pointer-events: none; }
+  .pop { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; line-height: 1.4; box-shadow: 0 6px 24px rgba(0,0,0,0.18); min-width: 200px; max-width: 260px; display: none; z-index: 2; }
+  .pop b { font-size: 15px; }
+  .pop .m { color: var(--muted); }
+  .pop img { float: right; width: 44px; height: 44px; margin: -2px -2px 0 8px; }
+  .eq { margin-top: 20px; }
+  .eq h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+  .formula { font: 20px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0 0 6px; }
+  .formula b { color: var(--accent); }
+  .where { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+  .legend { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-top: 12px; }
+  .legend div { text-align: center; font-size: 12px; color: var(--muted); }
+  .legend img { width: 100%; max-width: 56px; height: auto; display: block; margin: 0 auto 2px; }
+  .legend .n { font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .cap { display: flex; align-items: center; gap: 12px; margin-top: 14px; font-size: 14px; color: var(--muted); }
+  .cap input { width: 220px; accent-color: var(--accent); }
+  .notes { color: var(--muted); font-size: 13px; margin-top: 18px; line-height: 1.55; }
+  .notes a { color: inherit; }
+  @media (max-width: 640px) { h1 { font-size: 24px; } .formula { font-size: 15px; } .legend { grid-template-columns: repeat(5, 1fr); } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>How fresh is your district?</h1>
+      <p class="lede">All 435 U.S. House districts for the 2026 midterms, one banana each. Green means the district is close enough that every vote counts. Black means the outcome was settled when the lines were drawn. Hover a banana.</p>
+    </div>
+    <button id="themebtn" type="button">dark</button>
+  </header>
+
+  <div class="panel mapwrap">
+    <svg id="map" viewBox="45 -5 760 700" role="img" aria-label="Hex cartogram of 435 congressional districts, each shown as a banana at its ripeness stage"></svg>
+    <div class="pop" id="pop"></div>
+  </div>
+
+  <section class="panel eq">
+    <h2>The rule</h2>
+    <p class="formula">stage = 1 + round( 9 × min(|margin|, <b id="capv">20</b>) / <b id="capv2">20</b> )</p>
+    <p class="where">margin = Harris minus Trump, 2024, counted inside the district as it is drawn for 2026. Stage 1 is green, stage 10 is black. Anything past a <span id="capv3">20</span>-point lean is treated as fully gone.</p>
+    <div class="legend" id="legend"></div>
+    <div class="cap"><label for="cap">Try a different cap</label><input type="range" id="cap" min="10" max="40" step="1" value="20"><span id="capout"></span></div>
+    <p class="notes">
+      This is a structural measure. It says nothing about who is running, who has money, or what the national mood is. It asks one question: before any campaign, how far from a coin flip is this district? Expert handicappers answer a different question: who will win.
+      <br><br>
+      Margins: <a href="https://www.the-downballot.com/p/the-downballots-calculations-of-presidential">The Downballot</a>, 2024 presidential results calculated on the 2026 district lines, rounded to whole points. Hexmap: Daniel Donner for <a href="https://the-db.co/maps">The Downballot</a>, CC BY 4.0. Missouri is shown on its 2022 lines, which a court ordered used for 2026 after the state's primary had already been run on a different map. Vacant seats show the last incumbent. Bananas: <a href="/">nanalytics.dev</a>, CC0.
+    </p>
+  </section>
+</main>
+<script>
+(async function () {
+  const root = document.documentElement, btn = document.getElementById('themebtn');
+  let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark/' : '';
+  const SLUGS = ['green','breaking','turning','yellow-green','ripe','yellow','flecked','spotted','brown','black'];
+  const STAGE_LAST_FRAME = [4, 6, 8, 9, 10, 11, 16, 22, 28, 35];
+  const img = (stage, size) => `/v1/${theme}stages/${size}/${stage}.webp`;
+
+  const data = await (await fetch('data.json')).json();
+  let CAP = data.cap;
+  const stageFor = m => 1 + Math.round(9 * Math.min(Math.abs(m), CAP) / CAP);
+
+  const svg = document.getElementById('map'), NS = 'http://www.w3.org/2000/svg';
+  const pathd = rings => rings.map(r => 'M' + r.map(p => p.join(',')).join('L') + 'Z').join('');
+  // state outlines first (under), then district cells, then bananas
+  const gS = document.createElementNS(NS, 'g'), gC = document.createElementNS(NS, 'g'), gB = document.createElementNS(NS, 'g');
+  svg.append(gS, gC, gB);
+  for (const s of data.states) { const p = document.createElementNS(NS, 'path'); p.setAttribute('class', 'state'); p.setAttribute('d', pathd(s.rings)); gS.append(p); }
+
+  const pop = document.getElementById('pop'), wrap = svg.parentElement;
+  const fmtMargin = m => m === 0 ? 'Even' : (m > 0 ? `Harris +${m}` : `Trump +${-m}`);
+  const images = new Map();
+  for (const d of data.districts) {
+    const p = document.createElementNS(NS, 'path'); p.setAttribute('class', 'cell'); p.setAttribute('d', pathd(d.rings)); gC.append(p);
+    // banana sized to the district's bounding box
+    const xs = d.rings[0].map(q => q[0]), ys = d.rings[0].map(q => q[1]);
+    const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+    const sz = Math.min(w, h) * 1.1;
+    const im = document.createElementNS(NS, 'image');
+    im.setAttribute('width', sz); im.setAttribute('height', sz);
+    im.setAttribute('x', d.c[0] - sz / 2); im.setAttribute('y', d.c[1] - sz / 2);
+    gB.append(im); images.set(d.id, im);
+    const show = (ev) => {
+      const st = stageFor(d.margin);
+      const note = d.id.startsWith('MO-') ? '<br><span class="m">* Missouri: 2022 lines, by court order</span>' : '';
+      const vac = d.inc.startsWith('VACANT') ? ' (vacant)' : '';
+      pop.innerHTML = `<img src="${img(st, 128)}" alt=""><b>${d.id}</b><span class="m"> · ${d.state}</span><br>${d.inc.replace(/^VACANT \((.*)\)$/, '$1')}${vac} (${d.party})<br><span class="m">2024: ${fmtMargin(d.margin)}</span><br>Stage ${st} of 10, ${SLUGS[st-1]}${note}`;
+      pop.style.display = 'block'; p.classList.add('active'); move(ev);
+    };
+    const move = (ev) => {
+      const r = wrap.getBoundingClientRect();
+      let x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14;
+      if (x + 270 > r.width) x = ev.clientX - r.left - 270;
+      if (y + 140 > r.height) y = ev.clientY - r.top - 130;
+      pop.style.left = x + 'px'; pop.style.top = y + 'px';
+    };
+    const hide = () => { pop.style.display = 'none'; p.classList.remove('active'); };
+    p.addEventListener('mouseenter', show); p.addEventListener('mousemove', move); p.addEventListener('mouseleave', hide);
+    p.addEventListener('click', ev => { ev.stopPropagation(); pop.style.display === 'block' && p.classList.contains('active') ? hide() : show(ev); });
+  }
+  document.addEventListener('click', () => { pop.style.display = 'none'; gC.querySelectorAll('.active').forEach(e => e.classList.remove('active')); });
+
+  const legend = document.getElementById('legend');
+  function render() {
+    const counts = new Array(11).fill(0);
+    for (const d of data.districts) { const st = stageFor(d.margin); counts[st]++; images.get(d.id).setAttribute('href', img(st, 64)); }
+    legend.innerHTML = '';
+    for (let s = 1; s <= 10; s++) legend.insertAdjacentHTML('beforeend', `<div><img src="${img(s, 64)}" alt="stage ${s}"><div class="n">${counts[s]}</div>${SLUGS[s-1]}</div>`);
+    for (const id of ['capv','capv2','capv3']) document.getElementById(id).textContent = CAP;
+    document.getElementById('capout').textContent = `${CAP} points → ${counts[1]} green, ${counts[10]} black of 435`;
+  }
+  document.getElementById('cap').addEventListener('input', e => { CAP = +e.target.value; render(); });
+
+  function applyTheme(dark) { root.dataset.theme = dark ? 'dark' : 'light'; theme = dark ? 'dark/' : ''; btn.textContent = dark ? 'light' : 'dark'; render(); }
+  btn.addEventListener('click', () => applyTheme(root.dataset.theme !== 'dark'));
+  applyTheme(theme === 'dark/');
+})();
+</script>
+</body>
+</html>
