@@ -4,13 +4,11 @@ Version 1 (draft, October 2026)
 
 ## Why
 
-Numbers in a dashboard carry an authority they haven't always earned. A 2 is a 2. Nobody argues with it, even when the thing it measures is fuzzy, sampled, lagged, or half-guessed. The precision of the display gets mistaken for precision in the world.
+Good communication requires a judicious balancing of ambiguity and clarity. Sometimes being a bit ambiguous delivers more clarity than if you rely on the thing everyone thinks is the definition of clear - numbers. After all, a 2, is always a 2? But the apparent clarity of numbers is a bit of a cognitive honey trap and so the idea of using a clearly ambiguous inference, is way of trying to tell the evaluative gray mush between your ears, to slow it's roll.
 
-Nanalytics is a small, deliberate counterweight. It gives you a ripening banana instead of a number. Not as a joke (though it's a little funny), but because a banana is read differently than a digit. Everyone knows what a green banana means and what a black one means, and everyone also knows there's no exact line between "ripe" and "too ripe." The glyph carries a judgment and leaves room for yours.
+To be clear about what it is and isn't: the service is still called with a number and maps it deterministically to a frame. The ambiguity isn't in the encoding, it's in the reading only. The number stays in your system. The human gets the banana, and has to interpret it. That's the point.
 
-To be clear about what it is and isn't: the service is called with a number and maps it deterministically to a frame. The ambiguity isn't in the encoding, it's in the reading. The number stays in your system. The human gets the banana, and has to interpret it. That's the point.
-
-Use it where a number would overstate your confidence: data freshness, how long a ticket has been sitting, license health, anything that ages. Don't use it where someone needs the number. It complements a figure, it doesn't replace one that matters.
+Use it where a number would overstate your confidence: data freshness, how long a project has been sitting unloved, how many miles your car has moved beyond it's change oil marker, basically anything that ages. Don't use it where someone needs the number. While I think it would be funny to deliver everyone their bank statements with banana math, it's probably not respectful of their needs. Things are funny when everyone is laughing, as Nana used to say.
 
 ## The vocabulary
 
@@ -78,7 +76,7 @@ Two themes. The default has no treatment and sits on anything light. `dark/` add
 
 ## Licensing
 
-Images: CC0 1.0. Code: MIT. No attribution required anywhere, because a glyph embedded in a thousand dashboards can't carry one.
+Images: CC0 1.0. Code: MIT. No attribution required anywhere, that would be silly.
 
 ## Self-hosting
 
