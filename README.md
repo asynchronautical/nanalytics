@@ -6,7 +6,7 @@ A ripening banana as a status glyph. 35 photographic frames, 10 named stages, se
 <img src="https://nanalytics.dev/v1/banana?value=0.72" alt="stage 9 of 10, brown">
 ```
 
-Why would you want this? Because a number in a dashboard looks more certain than it usually is, and a banana doesn't. Read [SPEC.md](SPEC.md) for the argument and the vocabulary.
+Why would you want this? Because numbers in a dashboard convey certainty, and bananas don't. Read [SPEC.md](SPEC.md) for the argument and the vocabulary.
 
 ## Layout
 
