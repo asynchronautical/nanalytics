@@ -3,7 +3,7 @@
 A ripening banana as a status glyph. 35 photographic frames, 10 named stages, served by URL, CC0.
 
 ```html
-<img src="https://YOUR-DOMAIN/v1/banana?value=0.72" alt="stage 8 of 10, spotted">
+<img src="https://nanalytics.dev/v1/banana?value=0.72" alt="stage 9 of 10, brown">
 ```
 
 Why would you want this? Because a number in a dashboard looks more certain than it usually is, and a banana doesn't. Read [SPEC.md](SPEC.md) for the argument and the vocabulary.
