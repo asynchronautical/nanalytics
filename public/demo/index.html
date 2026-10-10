@@ -91,14 +91,14 @@
   const frameUrl = (f, size=128) => `../v1/${theme}frames/${size}/${String(f).padStart(2,'0')}.webp`;
 
   const sources = [
-    ['HubSpot deals',           0.5,  4],
-    ['Zendesk tickets',         2,    24],
-    ['Canvas LTI launches',     31,   24],
-    ['Active user counts',      6*24, 7*24],
-    ['QuickBooks receivables',  19*24, 30*24],
-    ['Scholar alerts',          44*24, 14*24],
-    ['Campaign sends',          null, 24],
-    ['Status page uptime',      3,    1],
+    ['CRM sync',                   0.5,   4],
+    ['Support ticket queue',       2,     24],
+    ['Web analytics export',       31,    24],
+    ['Weekly usage report',        6*24,  7*24],
+    ['Receivables aging',          19*24, 30*24],
+    ['Staging database refresh',   44*24, 14*24],
+    ['Email campaign stats',       null,  24],
+    ['Uptime monitor heartbeat',   3,     1],
   ];
   const nb = document.querySelector('#numtable tbody'), bb = document.querySelector('#bantable tbody');
   function render() {
