@@ -76,7 +76,7 @@
         <div class="out" id="playout"></div>
       </div>
     </div>
-    <p class="note">On the hosted service the same thing is one URL: <code>/v1/banana?value=0.4</code></p>
+    <p class="note">On the hosted service the same thing is one URL: <code id="urlout">/v1/banana?value=0.4</code></p>
   </section>
 </main>
 <script>
@@ -123,6 +123,7 @@
     const t = parseFloat(slider.value), f = frameFor(t), s = stageFor(f);
     img.src = frameUrl(f, 256); img.alt = `Banana, frame ${f} of 35, stage ${s} of 10 (${SLUGS[s-1]})`;
     out.textContent = `value ${t.toFixed(2)}  ->  frame ${f}/35, stage ${s}/10 "${SLUGS[s-1]}"`;
+    document.getElementById('urlout').textContent = `/v1/banana?value=${t.toFixed(2)}${theme ? '&theme=dark' : ''}`;
   }
   slider.addEventListener('input', update);
   const root = document.documentElement, btn = document.getElementById('themebtn');
