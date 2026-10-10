@@ -40,6 +40,9 @@ export default {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, "");
 
+    // No landing page yet: the demo is the front door.
+    if (p === "") return Response.redirect(`${url.origin}/demo/`, 302);
+
     if (p === "/v1/banana" || p === "/v1/shields") {
       const size = pickSize(url.searchParams.get("size"));
       const fmt = pickFormat(url.searchParams.get("format"));
