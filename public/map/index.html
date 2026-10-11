@@ -9,13 +9,12 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 36px 16px 72px; }
   main { max-width: 1100px; margin: 0 auto; }
-  h1 { font-size: 34px; margin: 0 0 8px; letter-spacing: -0.01em; }
-  .lede { color: var(--muted); margin: 0; max-width: 66ch; font-size: 17px; }
+  h1 { font-size: 40px; font-weight: 400; margin: 0 0 24px; letter-spacing: -0.005em; text-align: center; }
+  .intro { color: var(--muted); font-size: 21px; line-height: 1.4; max-width: 60ch; margin: 36px auto 40px; }
+  .intro p { margin: 0 0 22px; }
 
-  .hero { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: center; margin: 28px 0 8px; }
-  .hero img { width: 200px; height: 200px; }
-  .herohead { font-size: 40px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 6px; line-height: 1.05; }
-  .herotext { margin: 0; font-size: 19px; max-width: 46ch; }
+  .hero { text-align: center; }
+  .hero img { width: 460px; height: 460px; max-width: 90vw; max-height: 90vw; }
 
   .mapwrap { position: relative; margin-top: 8px; }
   svg { width: 100%; height: auto; display: block; }
@@ -49,7 +48,7 @@
   @media (max-width: 640px) {
     h1 { font-size: 26px; } .formula { font-size: 14px; }
     .legend { grid-template-columns: repeat(5, 1fr); }
-    .hero { grid-template-columns: 120px 1fr; gap: 16px; } .hero img { width: 120px; height: 120px; } .herohead { font-size: 28px; } .herotext { font-size: 16px; }
+    h1 { font-size: 30px; } .intro { font-size: 18px; }
     .reveal { grid-template-columns: 1fr; }
   }
 </style>
@@ -57,15 +56,16 @@
 <body>
 <main>
   <h1>How fresh is your democracy?</h1>
-  <p class="lede">All 435 U.S. House districts for the 2026 midterms, one banana each. A green banana means the district is close enough that every vote counts. A black banana means the outcome was settled when the lines were drawn. You're seeing the green ones first. Drag the slider to see the rest.</p>
 
   <section class="hero">
     <img id="heroimg" alt="A green banana">
-    <div>
-      <p class="herohead"><span id="greencount">11</span> of 435 districts</p>
-      <p class="herotext">A green banana means people have an actual choice. The rest were decided, to varying degrees, when the lines were drawn.</p>
-    </div>
   </section>
+
+  <div class="intro">
+    <p>In the map below, a pure green banana means the district is a “tossup” district, a place where every vote counts and all the voters in the district have a powerful voice in choosing their representative.</p>
+    <p>Of 435 U.S. House districts, only <span id="greencount">11</span> are true “tossup” districts. A black banana means the outcome was settled when the congressional lines were drawn and the outcome already known before the first ballot was cast.</p>
+    <p>You're seeing the green ones here first, but drag the slider to see the rest of the story unfold.</p>
+  </div>
 
   <div class="mapwrap">
     <svg id="map" role="img" aria-label="Hex cartogram of 435 congressional districts, each shown as a banana at its ripeness stage"></svg>
@@ -153,7 +153,7 @@
     document.getElementById('revealn').textContent = REVEAL >= 10 ? 'All 435 districts' : `${shown} of 435 districts`;
     document.getElementById('revealhint').style.display = REVEAL >= 10 ? 'none' : '';
     document.getElementById('greencount').textContent = counts[1];
-    document.getElementById('heroimg').src = img(1, 256);
+    document.getElementById('heroimg').src = img(1, 512);
     legend.innerHTML = '';
     for (let s = 1; s <= 10; s++) legend.insertAdjacentHTML('beforeend', `<div><img src="${img(s, 128)}" alt="stage ${s}, ${SLUGS[s-1]}"><div class="n">${counts[s]}</div></div>`);
   }
