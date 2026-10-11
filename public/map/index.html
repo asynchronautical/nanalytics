@@ -114,6 +114,12 @@
   const stageFor = m => 1 + Math.round(9 * Math.min(Math.abs(m), CAP) / CAP);
 
   const svg = document.getElementById('map'), NS = 'http://www.w3.org/2000/svg';
+  { // fit the frame to the data
+    const P = data.districts.flatMap(d => d.rings.flat());
+    const xs = P.map(q => q[0]), ys = P.map(q => q[1]);
+    const x0 = Math.min(...xs) - 12, y0 = Math.min(...ys) - 12, x1 = Math.max(...xs) + 12, y1 = Math.max(...ys) + 12;
+    svg.setAttribute('viewBox', `${x0} ${y0} ${x1 - x0} ${y1 - y0}`);
+  }
   const pathd = rings => rings.map(r => 'M' + r.map(p => p.join(',')).join('L') + 'Z').join('');
   // state outlines first (under), then district cells, then bananas
   const gS = document.createElementNS(NS, 'g'), gC = document.createElementNS(NS, 'g'), gB = document.createElementNS(NS, 'g');
