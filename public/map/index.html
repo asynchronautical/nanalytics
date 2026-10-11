@@ -64,7 +64,7 @@
   <div class="intro">
     <p>In the map below, a pure green banana means the district is a “tossup” district, a place where every vote counts and all the voters in the district have a powerful voice in choosing their representative.</p>
     <p>Of 435 U.S. House districts, only <span id="greencount">11</span> are true “tossup” districts. A black banana means the outcome was settled when the congressional lines were drawn and the outcome already known before the first ballot was cast.</p>
-    <p>You're seeing the green ones here first, but drag the slider to see the rest of the story unfold.</p>
+    <p>Drag the slider to the right, to find out how rare the fresh bananas are.</p>
   </div>
 
   <div class="mapwrap">
@@ -72,8 +72,8 @@
     <div class="pop" id="pop"></div>
   </div>
   <div class="reveal">
-    <input type="range" id="reveal" min="1" max="10" step="1" value="1" aria-label="How many ripeness stages to show">
-    <div class="revealout"><span id="revealn"></span><span id="revealhint" class="m">Drag right to see the rest.</span></div>
+    <input type="range" id="reveal" min="1" max="10" step="1" value="1" aria-label="Drag right to hide riper districts and keep only the fresher ones">
+    <div class="revealout"><span id="revealn"></span><span id="revealhint" class="m">Drag right to find the fresh ones.</span></div>
   </div>
 
   <h2>District breakdown</h2>
@@ -85,7 +85,7 @@
     <p class="notes">
       This is a structural measure. It says nothing about who is running, who has money, or what the national mood is. It asks one question: before any campaign, how far from a coin flip is this district? Expert handicappers answer a different question: who will win.
       <br><br>
-      Margins: <a href="https://www.the-downballot.com/p/the-downballots-calculations-of-presidential">The Downballot</a>, 2024 presidential results calculated on the 2026 district lines, rounded to whole points. Hexmap: Daniel Donner for <a href="https://the-db.co/maps">The Downballot</a>, CC BY 4.0, with the gaps between states tightened. Missouri is shown on its 2022 lines, which a court ordered used for 2026 after the state's primary had already been run on a different map. Vacant seats show the last incumbent. Bananas: <a href="/">nanalytics.dev</a>, CC0.
+      Margins: <a href="https://www.the-downballot.com/p/the-downballots-calculations-of-presidential">The Downballot</a>, 2024 presidential results calculated on the 2026 district lines, rounded to whole points. Hexmap: Daniel Donner for <a href="https://the-db.co/maps">The Downballot</a>, CC BY 4.0, with the gaps between states tightened. Missouri is shown on its 2022 lines, which a court ordered used for 2026 after the state's primary had already been run on a different map. Vacant seats show the last incumbent. Bananas: <a href="/">nanalytics.dev</a>, CC0. This map is one demo of that project, an open glyph service that answers a URL with a banana at any ripeness, code and images on <a href="https://github.com/asynchronautical/nanalytics">GitHub</a>.
     </p>
   </div>
 </main>
@@ -96,7 +96,7 @@
 
   const data = await (await fetch('data.json')).json();
   const CAP = data.cap;
-  let REVEAL = 1;
+  let REVEAL = 10;
   const stageFor = m => 1 + Math.round(9 * Math.min(Math.abs(m), CAP) / CAP);
 
   const svg = document.getElementById('map'), NS = 'http://www.w3.org/2000/svg';
@@ -151,13 +151,13 @@
     }
     const shown = counts.slice(1, REVEAL + 1).reduce((a, b) => a + b, 0);
     document.getElementById('revealn').textContent = REVEAL >= 10 ? 'All 435 districts' : `${shown} of 435 districts`;
-    document.getElementById('revealhint').style.display = REVEAL >= 10 ? 'none' : '';
+    document.getElementById('revealhint').style.display = REVEAL <= 1 ? 'none' : '';
     document.getElementById('greencount').textContent = counts[1];
     document.getElementById('heroimg').src = img(1, 512);
     legend.innerHTML = '';
     for (let s = 1; s <= 10; s++) legend.insertAdjacentHTML('beforeend', `<div><img src="${img(s, 128)}" alt="stage ${s}, ${SLUGS[s-1]}"><div class="n">${counts[s]}</div></div>`);
   }
-  document.getElementById('reveal').addEventListener('input', e => { REVEAL = +e.target.value; render(); });
+  document.getElementById('reveal').addEventListener('input', e => { REVEAL = 11 - e.target.value; render(); });
   render();
 })();
 </script>
