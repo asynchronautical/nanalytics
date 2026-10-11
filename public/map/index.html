@@ -14,7 +14,7 @@
   .intro p { margin: 0 0 22px; }
 
   .hero { text-align: center; }
-  .hero img { width: 460px; height: 460px; max-width: 90vw; max-height: 90vw; }
+  .hero img { width: 368px; height: 368px; max-width: 80vw; max-height: 80vw; }
 
   .mapwrap { position: relative; margin-top: 8px; }
   svg { width: 100%; height: auto; display: block; }
@@ -28,7 +28,8 @@
   .pop .m { color: var(--muted); }
   .pop img { float: right; width: 44px; height: 44px; margin: -2px -2px 0 8px; }
 
-  .reveal { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; margin-top: 6px; }
+  .reveal { display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: center; margin-top: 6px; }
+  .reveal .key { width: 40px; height: 40px; display: block; }
   .reveal input { width: 100%; accent-color: var(--accent); }
   .revealout { font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .revealout .m { color: var(--muted); margin-left: 10px; }
@@ -49,13 +50,13 @@
     h1 { font-size: 26px; } .formula { font-size: 14px; }
     .legend { grid-template-columns: repeat(5, 1fr); }
     h1 { font-size: 30px; } .intro { font-size: 18px; }
-    .reveal { grid-template-columns: 1fr; }
+    .reveal { grid-template-columns: auto 1fr auto; } .revealout { grid-column: 1 / -1; }
   }
 </style>
 </head>
 <body>
 <main>
-  <h1>How fresh is your democracy?</h1>
+  <h1>Nanalytics<br>How fresh is your democracy?</h1>
 
   <section class="hero">
     <img id="heroimg" alt="A green banana">
@@ -72,7 +73,9 @@
     <div class="pop" id="pop"></div>
   </div>
   <div class="reveal">
+    <img class="key" src="/v1/stages/128/10.webp" alt="black banana">
     <input type="range" id="reveal" min="1" max="10" step="1" value="1" aria-label="Drag right to hide riper districts and keep only the fresher ones">
+    <img class="key" src="/v1/stages/128/1.webp" alt="green banana">
     <div class="revealout"><span id="revealn"></span><span id="revealhint" class="m">Drag right to find the fresh ones.</span></div>
   </div>
 
