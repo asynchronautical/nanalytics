@@ -17,7 +17,6 @@ public/v1/dark/...                       rimmed variant for dark backgrounds
 public/v1/manifest.json
 src/index.js        Cloudflare Worker: resolves ?value= to a file, serves shields JSON
 public/index.html   the landing page at nanalytics.dev
-demo/               a dashboard shown twice, once with numbers, once with bananas
 map/                How fresh is your democracy? All 435 U.S. House districts as bananas
 ```
 

@@ -37,7 +37,7 @@
   .url { margin-top: 14px; }
   .url code { display: block; word-break: break-all; }
 
-  .demos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .demos { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 560px; }
   .demo { display: block; text-decoration: none; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; transition: border-color .15s; }
   .demo:hover { border-color: var(--accent); }
   .demo b { display: block; font-size: 20px; font-weight: 500; margin-bottom: 6px; }
@@ -55,7 +55,6 @@
   @media (max-width: 640px) {
     h1 { font-size: 34px; } .tag { font-size: 18px; } .prose { font-size: 17px; }
     .try { grid-template-columns: 1fr; } .try img { margin: 0 auto; }
-    .demos { grid-template-columns: 1fr; }
     .stages { grid-template-columns: repeat(5, 1fr); }
   }
 </style>
@@ -69,8 +68,8 @@
   <p class="stripcap">One banana, one fixed rig, about four weeks. 35 frames, 10 named stages, served by URL.</p>
 
   <div class="prose">
-    <p>Dashboards run on numbers, and numbers convey certainty. A 2 is always a 2. But that clarity is a bit of a cognitive honey trap. A ripening banana still tells you something, how fresh, how far gone, roughly how long you've got, and it leaves the reading to you. The number stays in your system. The human gets the banana, and has to interpret it. That's the point.</p>
-    <p>Use it where a number would overstate your confidence: data freshness, how long a project has sat unloved, how far past the oil change marker your car is, anything that ages. Don't use it where someone needs the number.</p>
+    <p>Dashboards run on numbers, and numbers convey certainty. A 2 is always a 2. But the apparent clarity of a number can be a bit of a cognitive honey trap, presenting as clear something that really should remain ambiguous, at least a bit. A ripening banana still tells you something, how fresh, how far gone, roughly how long you've got, but above all it says “think about me a bit more.” And that's the point.</p>
+    <p>Use it where a number might overstate your confidence: data freshness, how long a project has sat unloved, how far past the oil change marker your car is, anything that ages. Don't use it where someone needs the number. You should probably still report vital signs and lab results as actual numbers.</p>
   </div>
 
   <h2>Try it</h2>
@@ -93,17 +92,12 @@ Google Sheets:  =IMAGE("https://nanalytics.dev/v1/banana?value=" &amp; A2 &amp; 
   <h2>The ten stages</h2>
   <div class="stages" id="stages"></div>
 
-  <h2>Two demos</h2>
+  <h2>The demo</h2>
   <div class="demos">
     <a class="demo" href="/map/">
       <div class="row"><img src="/v1/stages/64/1.webp" alt=""><img src="/v1/stages/64/3.webp" alt=""><img src="/v1/stages/64/6.webp" alt=""><img src="/v1/stages/64/9.webp" alt=""><img src="/v1/stages/64/10.webp" alt=""></div>
       <b>How fresh is your democracy?</b>
       <span>All 435 U.S. House districts as bananas. Green means every vote counts. Most of the map is black.</span>
-    </a>
-    <a class="demo" href="/demo/">
-      <div class="row"><img src="/v1/stages/64/1.webp" alt=""><img src="/v1/stages/64/2.webp" alt=""><img src="/v1/stages/64/7.webp" alt=""><img src="/v1/stages/64/8.webp" alt=""><img src="/v1/stages/64/unknown.webp" alt=""></div>
-      <b>Same dashboard, twice</b>
-      <span>Data freshness against SLA, once with numbers and a red threshold, once with bananas and no threshold at all.</span>
     </a>
   </div>
 
