@@ -16,8 +16,9 @@ public/v1/frames/{size}/{01..35}.{webp,png}
 public/v1/dark/...                       rimmed variant for dark backgrounds
 public/v1/manifest.json
 src/index.js        Cloudflare Worker: resolves ?value= to a file, serves shields JSON
+public/index.html   the landing page at nanalytics.dev
 demo/               a dashboard shown twice, once with numbers, once with bananas
-map/                How fresh is your democracy? All 435 U.S. House districts as bananas (the front door at nanalytics.dev)
+map/                How fresh is your democracy? All 435 U.S. House districts as bananas
 ```
 
 ## Deploy
@@ -28,7 +29,7 @@ npx wrangler login
 npx wrangler deploy
 ```
 
-Static files under `public/` are served by Cloudflare's asset layer, free and unlimited. The Worker only runs for `/v1/banana` and `/v1/shields`.
+Static files under `public/` are served by Cloudflare's asset layer, free and unlimited. The Worker only does work for `/v1/banana` and `/v1/shields`; everything else, including the landing page, is a static file.
 
 ## License
 

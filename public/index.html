@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nanalytics</title>
+<meta name="description" content="A ripening banana as a status glyph. 35 photographic frames, 10 named stages, served by URL, CC0.">
+<meta property="og:title" content="Nanalytics">
+<meta property="og:description" content="A ripening banana as a status glyph. Call a URL with a number, get a banana at that ripeness.">
+<meta property="og:image" content="https://nanalytics.dev/v1/stages/512/7.png">
+<link rel="icon" href="/v1/stages/64/5.png">
+<style>
+  :root { --bg: #f6f3ee; --ink: #1d1a16; --muted: #6b655c; --line: #e2dbcf; --accent: #8a6d1f; --panel: #fdfcfa; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 48px 16px 80px; }
+  main { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 44px; font-weight: 400; margin: 0; text-align: center; letter-spacing: -0.005em; }
+  .tag { text-align: center; color: var(--muted); font-size: 21px; margin: 8px 0 36px; }
+  a { color: var(--accent); }
+
+  .strip { display: flex; gap: 0; align-items: flex-end; margin: 0 auto 8px; }
+  .strip img { width: calc(100% / 35); height: auto; display: block; }
+  .stripcap { text-align: center; color: var(--muted); font-size: 14px; margin: 0 0 44px; }
+
+  .prose { max-width: 62ch; margin: 0 auto; font-size: 19px; line-height: 1.5; }
+  .prose p { margin: 0 0 20px; }
+
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 52px 0 14px; font-weight: 600; }
+
+  .try { display: grid; grid-template-columns: 200px 1fr; gap: 28px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 26px; }
+  .try img { width: 200px; height: 200px; display: block; }
+  .try input[type=range] { width: 100%; accent-color: var(--accent); }
+  .try .out { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 15px; margin-top: 8px; }
+  code, pre { font: 15px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  pre { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; overflow-x: auto; margin: 0; }
+  code.inline { background: var(--line); padding: 1px 6px; border-radius: 4px; }
+  .url { margin-top: 14px; }
+  .url code { display: block; word-break: break-all; }
+
+  .demos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .demo { display: block; text-decoration: none; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; transition: border-color .15s; }
+  .demo:hover { border-color: var(--accent); }
+  .demo b { display: block; font-size: 20px; font-weight: 500; margin-bottom: 6px; }
+  .demo span { color: var(--muted); font-size: 16px; }
+  .demo .row { display: flex; gap: 2px; margin-bottom: 14px; }
+  .demo .row img { width: 36px; height: 36px; }
+
+  .stages { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+  .stages div { text-align: center; font-size: 13px; color: var(--muted); }
+  .stages img { width: 100%; max-width: 64px; height: auto; display: block; margin: 0 auto 4px; }
+
+  .foot { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .foot a { color: inherit; }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 34px; } .tag { font-size: 18px; } .prose { font-size: 17px; }
+    .try { grid-template-columns: 1fr; } .try img { margin: 0 auto; }
+    .demos { grid-template-columns: 1fr; }
+    .stages { grid-template-columns: repeat(5, 1fr); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Nanalytics</h1>
+  <p class="tag">A ripening banana as a status glyph.</p>
+
+  <div class="strip" id="strip" aria-label="The 35 frames, green to black"></div>
+  <p class="stripcap">One banana, one fixed rig, about four weeks. 35 frames, 10 named stages, served by URL.</p>
+
+  <div class="prose">
+    <p>Dashboards run on numbers, and numbers convey certainty. A 2 is always a 2. But that clarity is a bit of a cognitive honey trap. A ripening banana still tells you something, how fresh, how far gone, roughly how long you've got, and it leaves the reading to you. The number stays in your system. The human gets the banana, and has to interpret it. That's the point.</p>
+    <p>Use it where a number would overstate your confidence: data freshness, how long a project has sat unloved, how far past the oil change marker your car is, anything that ages. Don't use it where someone needs the number.</p>
+  </div>
+
+  <h2>Try it</h2>
+  <div class="try">
+    <img id="tryimg" alt="">
+    <div>
+      <input type="range" id="tryval" min="0" max="1" step="0.01" value="0.35" aria-label="Value from 0 to 1">
+      <div class="out" id="tryout"></div>
+      <div class="url"><code id="tryurl"></code></div>
+    </div>
+  </div>
+
+  <h2>Use it</h2>
+  <p class="prose" style="margin-bottom:14px">One image tag. Pass any number, tell it the range, and the service answers with the matching banana. Works anywhere an image URL works: a dashboard, a README, a status page, a spreadsheet cell.</p>
+<pre>&lt;img src="https://nanalytics.dev/v1/banana?value=37&amp;min=0&amp;max=90"&gt;
+
+Google Sheets:  =IMAGE("https://nanalytics.dev/v1/banana?value=" &amp; A2 &amp; "&amp;min=0&amp;max=90")</pre>
+  <p class="prose" style="margin-top:14px">Add <code class="inline">&amp;theme=dark</code> for dark backgrounds, <code class="inline">&amp;mode=frame</code> for all 35 frames instead of 10 stages, <code class="inline">&amp;size=64</code> for a smaller file. No value, and you get a deliberately blank "unknown" banana, never a fresh one by default. The full vocabulary is in the <a href="https://github.com/asynchronautical/nanalytics/blob/main/SPEC.md">spec</a>.</p>
+
+  <h2>The ten stages</h2>
+  <div class="stages" id="stages"></div>
+
+  <h2>Two demos</h2>
+  <div class="demos">
+    <a class="demo" href="/map/">
+      <div class="row"><img src="/v1/stages/64/1.webp" alt=""><img src="/v1/stages/64/3.webp" alt=""><img src="/v1/stages/64/6.webp" alt=""><img src="/v1/stages/64/9.webp" alt=""><img src="/v1/stages/64/10.webp" alt=""></div>
+      <b>How fresh is your democracy?</b>
+      <span>All 435 U.S. House districts as bananas. Green means every vote counts. Most of the map is black.</span>
+    </a>
+    <a class="demo" href="/demo/">
+      <div class="row"><img src="/v1/stages/64/1.webp" alt=""><img src="/v1/stages/64/2.webp" alt=""><img src="/v1/stages/64/7.webp" alt=""><img src="/v1/stages/64/8.webp" alt=""><img src="/v1/stages/64/unknown.webp" alt=""></div>
+      <b>Same dashboard, twice</b>
+      <span>Data freshness against SLA, once with numbers and a red threshold, once with bananas and no threshold at all.</span>
+    </a>
+  </div>
+
+  <p class="foot">
+    Images CC0, use them for anything, no credit needed. Code MIT. Everything is on <a href="https://github.com/asynchronautical/nanalytics">GitHub</a>, including the originals, so you can self-host if you'd rather not depend on a stranger's banana. The URLs under <code>/v1/</code> are immutable: same URL, same bytes, forever.
+  </p>
+</main>
+<script>
+  const STAGE_LAST_FRAME = [4, 6, 8, 9, 10, 11, 16, 22, 28, 35];
+  const SLUGS = ['green','breaking','turning','yellow-green','ripe','yellow','flecked','spotted','brown','black'];
+  const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x));
+  const frameFor = t => clamp(Math.round(t * 34) + 1, 1, 35);
+  const stageFor = f => STAGE_LAST_FRAME.findIndex(l => f <= l) + 1;
+
+  const strip = document.getElementById('strip');
+  for (let f = 1; f <= 35; f++) strip.insertAdjacentHTML('beforeend', `<img src="/v1/frames/64/${String(f).padStart(2,'0')}.webp" alt="frame ${f} of 35">`);
+
+  const stages = document.getElementById('stages');
+  for (let s = 1; s <= 10; s++) stages.insertAdjacentHTML('beforeend', `<div><img src="/v1/stages/128/${s}.webp" alt="stage ${s}, ${SLUGS[s-1]}">${s} ${SLUGS[s-1]}</div>`);
+
+  const val = document.getElementById('tryval'), img = document.getElementById('tryimg'), out = document.getElementById('tryout'), url = document.getElementById('tryurl');
+  function update() {
+    const t = parseFloat(val.value), f = frameFor(t), s = stageFor(f);
+    img.src = `/v1/stages/256/${s}.webp`; img.alt = `Banana, stage ${s} of 10 (${SLUGS[s-1]})`;
+    out.textContent = `value ${t.toFixed(2)}  →  stage ${s} of 10, ${SLUGS[s-1]}`;
+    url.textContent = `https://nanalytics.dev/v1/banana?value=${t.toFixed(2)}`;
+  }
+  val.addEventListener('input', update); update();
+</script>
+</body>
+</html>

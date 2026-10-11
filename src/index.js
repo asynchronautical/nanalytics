@@ -40,9 +40,6 @@ export default {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, "");
 
-    // No landing page yet: the congressional map is the front door. The dashboard demo stays at /demo/.
-    if (p === "") return Response.redirect(`${url.origin}/map/`, 302);
-
     if (p === "/v1/banana" || p === "/v1/shields") {
       const size = pickSize(url.searchParams.get("size"));
       const fmt = pickFormat(url.searchParams.get("format"));
