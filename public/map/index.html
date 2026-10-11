@@ -3,82 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How fresh is your district?</title>
+<title>How fresh is your democracy?</title>
 <style>
-  :root {
-    --bg: #f6f3ee; --panel: #ffffff; --ink: #1d1a16; --muted: #6b655c; --line: #e6e0d6;
-    --accent: #8a6d1f; --state: #cfc7ba; --cell: rgba(0,0,0,0.035); --cellhover: rgba(138,109,31,0.18);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #17161a; --panel: #211f24; --ink: #ece7df; --muted: #9d968b; --line: #332f36;
-      --accent: #d9b44a; --state: #3d3942; --cell: rgba(255,255,255,0.035); --cellhover: rgba(217,180,74,0.22);
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #17161a; --panel: #211f24; --ink: #ece7df; --muted: #9d968b; --line: #332f36;
-    --accent: #d9b44a; --state: #3d3942; --cell: rgba(255,255,255,0.035); --cellhover: rgba(217,180,74,0.22);
-  }
+  :root { --bg: #f6f3ee; --ink: #1d1a16; --muted: #6b655c; --line: #e2dbcf; --accent: #8a6d1f; --state: #cfc7ba; --cell: rgba(0,0,0,0.03); --cellhover: rgba(138,109,31,0.18); }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 28px 16px 64px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; padding: 36px 16px 72px; }
   main { max-width: 1100px; margin: 0 auto; }
-  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
-  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
-  .lede { color: var(--muted); margin: 0 0 20px; max-width: 64ch; }
-  #themebtn { font: inherit; font-size: 13px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); cursor: pointer; white-space: nowrap; }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
-  .mapwrap { position: relative; }
+  h1 { font-size: 34px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .lede { color: var(--muted); margin: 0; max-width: 66ch; font-size: 17px; }
+
+  .hero { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: center; margin: 28px 0 8px; }
+  .hero img { width: 200px; height: 200px; }
+  .herohead { font-size: 40px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 6px; line-height: 1.05; }
+  .herotext { margin: 0; font-size: 19px; max-width: 46ch; }
+
+  .mapwrap { position: relative; margin-top: 8px; }
   svg { width: 100%; height: auto; display: block; }
   .cell { fill: var(--cell); stroke: none; cursor: default; }
   .cell:hover, .cell.active { fill: var(--cellhover); }
   .state { fill: none; stroke: var(--state); stroke-width: 1.2; pointer-events: none; }
-  image { pointer-events: none; }
-  .pop { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; line-height: 1.4; box-shadow: 0 6px 24px rgba(0,0,0,0.18); min-width: 200px; max-width: 260px; display: none; z-index: 2; }
+  image { pointer-events: none; transition: opacity .25s ease; }
+  .dim { opacity: 0; }
+  .pop { position: absolute; pointer-events: none; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13px; line-height: 1.4; box-shadow: 0 6px 24px rgba(0,0,0,0.14); min-width: 200px; max-width: 260px; display: none; z-index: 2; }
   .pop b { font-size: 15px; }
   .pop .m { color: var(--muted); }
   .pop img { float: right; width: 44px; height: 44px; margin: -2px -2px 0 8px; }
-  .eq { margin-top: 20px; }
-  .eq h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
-  .formula { font: 20px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0 0 6px; }
-  .formula b { color: var(--accent); }
-  .where { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
-  .legend { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-top: 12px; }
-  .legend div { text-align: center; font-size: 12px; color: var(--muted); }
-  .legend img { width: 100%; max-width: 56px; height: auto; display: block; margin: 0 auto 2px; }
-  .legend .n { font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .reveal { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+
+  .reveal { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; margin-top: 6px; }
   .reveal input { width: 100%; accent-color: var(--accent); }
   .revealout { font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .revealout .m { color: var(--muted); margin-left: 10px; }
-  .hero { display: grid; grid-template-columns: 180px 1fr; gap: 20px; align-items: center; margin-top: 20px; padding: 8px 4px; }
-  .hero img { width: 180px; height: 180px; }
-  .herohead { font-size: 34px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 6px; line-height: 1.1; }
-  .herotext { margin: 0; font-size: 18px; max-width: 48ch; }
-  .dim { opacity: 0; }
-  image { transition: opacity .25s ease; }
-  .notes { color: var(--muted); font-size: 13px; margin-top: 18px; line-height: 1.55; }
+
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 36px 0 12px; font-weight: 600; }
+  .legend { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+  .legend div { text-align: center; }
+  .legend img { width: 100%; max-width: 72px; height: auto; display: block; margin: 0 auto 4px; }
+  .legend .n { font-size: 18px; font-variant-numeric: tabular-nums; }
+
+  .rule { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .formula { font: 18px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0 0 6px; }
+  .formula b { color: var(--accent); }
+  .where { color: var(--muted); font-size: 14px; margin: 0; max-width: 80ch; }
+  .notes { color: var(--muted); font-size: 13px; margin-top: 20px; line-height: 1.55; max-width: 90ch; }
   .notes a { color: inherit; }
-  @media (max-width: 640px) { h1 { font-size: 24px; } .formula { font-size: 15px; } .legend { grid-template-columns: repeat(5, 1fr); } .hero { grid-template-columns: 110px 1fr; } .hero img { width: 110px; height: 110px; } .herohead { font-size: 26px; } .reveal { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    h1 { font-size: 26px; } .formula { font-size: 14px; }
+    .legend { grid-template-columns: repeat(5, 1fr); }
+    .hero { grid-template-columns: 120px 1fr; gap: 16px; } .hero img { width: 120px; height: 120px; } .herohead { font-size: 28px; } .herotext { font-size: 16px; }
+    .reveal { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <div>
-      <h1>How fresh is your district?</h1>
-      <p class="lede">All 435 U.S. House districts for the 2026 midterms, one banana each. Green means the district is close enough that every vote counts. Black means the outcome was settled when the lines were drawn. You're seeing the green ones first. Drag the slider to see the rest.</p>
-    </div>
-    <button id="themebtn" type="button">dark</button>
-  </header>
-
-  <div class="panel mapwrap">
-    <svg id="map" viewBox="45 -5 760 700" role="img" aria-label="Hex cartogram of 435 congressional districts, each shown as a banana at its ripeness stage"></svg>
-    <div class="pop" id="pop"></div>
-    <div class="reveal">
-      <input type="range" id="reveal" min="1" max="10" step="1" value="1" aria-label="How many ripeness stages to show">
-      <div class="revealout"><span id="revealn"></span><span id="revealhint" class="m">Drag right to see the rest.</span></div>
-    </div>
-  </div>
+  <h1>How fresh is your democracy?</h1>
+  <p class="lede">All 435 U.S. House districts for the 2026 midterms, one banana each. A green banana means the district is close enough that every vote counts. A black banana means the outcome was settled when the lines were drawn. You're seeing the green ones first. Drag the slider to see the rest.</p>
 
   <section class="hero">
     <img id="heroimg" alt="A green banana">
@@ -88,25 +67,32 @@
     </div>
   </section>
 
-  <section class="panel eq">
-    <h2>The rule</h2>
-    <p class="formula">stage = 1 + round( 9 × min(|margin|, <b id="capv">20</b>) / <b id="capv2">20</b> )</p>
-    <p class="where">margin = Harris minus Trump, 2024, counted inside the district as it is drawn for 2026. Stage 1 is green, stage 10 is black. Anything past a <span id="capv3">20</span>-point lean is treated as fully gone.</p>
-    <div class="legend" id="legend"></div>
+  <div class="mapwrap">
+    <svg id="map" role="img" aria-label="Hex cartogram of 435 congressional districts, each shown as a banana at its ripeness stage"></svg>
+    <div class="pop" id="pop"></div>
+  </div>
+  <div class="reveal">
+    <input type="range" id="reveal" min="1" max="10" step="1" value="1" aria-label="How many ripeness stages to show">
+    <div class="revealout"><span id="revealn"></span><span id="revealhint" class="m">Drag right to see the rest.</span></div>
+  </div>
+
+  <h2>District breakdown</h2>
+  <div class="legend" id="legend"></div>
+
+  <div class="rule">
+    <p class="formula">stage = 1 + round( 9 × min(|margin|, <b>20</b>) / <b>20</b> )</p>
+    <p class="where">margin = Harris minus Trump, 2024, counted inside the district as it is drawn for 2026. Stage 1 is green, stage 10 is black. Anything past a 20-point lean is treated as fully gone.</p>
     <p class="notes">
       This is a structural measure. It says nothing about who is running, who has money, or what the national mood is. It asks one question: before any campaign, how far from a coin flip is this district? Expert handicappers answer a different question: who will win.
       <br><br>
-      Margins: <a href="https://www.the-downballot.com/p/the-downballots-calculations-of-presidential">The Downballot</a>, 2024 presidential results calculated on the 2026 district lines, rounded to whole points. Hexmap: Daniel Donner for <a href="https://the-db.co/maps">The Downballot</a>, CC BY 4.0. Missouri is shown on its 2022 lines, which a court ordered used for 2026 after the state's primary had already been run on a different map. Vacant seats show the last incumbent. Bananas: <a href="/">nanalytics.dev</a>, CC0.
+      Margins: <a href="https://www.the-downballot.com/p/the-downballots-calculations-of-presidential">The Downballot</a>, 2024 presidential results calculated on the 2026 district lines, rounded to whole points. Hexmap: Daniel Donner for <a href="https://the-db.co/maps">The Downballot</a>, CC BY 4.0, with the gaps between states tightened. Missouri is shown on its 2022 lines, which a court ordered used for 2026 after the state's primary had already been run on a different map. Vacant seats show the last incumbent. Bananas: <a href="/">nanalytics.dev</a>, CC0.
     </p>
-  </section>
+  </div>
 </main>
 <script>
 (async function () {
-  const root = document.documentElement, btn = document.getElementById('themebtn');
-  let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark/' : '';
   const SLUGS = ['green','breaking','turning','yellow-green','ripe','yellow','flecked','spotted','brown','black'];
-  const STAGE_LAST_FRAME = [4, 6, 8, 9, 10, 11, 16, 22, 28, 35];
-  const img = (stage, size) => `/v1/${theme}stages/${size}/${stage}.webp`;
+  const img = (stage, size) => `/v1/stages/${size}/${stage}.webp`;
 
   const data = await (await fetch('data.json')).json();
   const CAP = data.cap;
@@ -114,14 +100,11 @@
   const stageFor = m => 1 + Math.round(9 * Math.min(Math.abs(m), CAP) / CAP);
 
   const svg = document.getElementById('map'), NS = 'http://www.w3.org/2000/svg';
-  { // fit the frame to the data
-    const P = data.districts.flatMap(d => d.rings.flat());
+  { const P = data.districts.flatMap(d => d.rings.flat());
     const xs = P.map(q => q[0]), ys = P.map(q => q[1]);
     const x0 = Math.min(...xs) - 12, y0 = Math.min(...ys) - 12, x1 = Math.max(...xs) + 12, y1 = Math.max(...ys) + 12;
-    svg.setAttribute('viewBox', `${x0} ${y0} ${x1 - x0} ${y1 - y0}`);
-  }
+    svg.setAttribute('viewBox', `${x0} ${y0} ${x1 - x0} ${y1 - y0}`); }
   const pathd = rings => rings.map(r => 'M' + r.map(p => p.join(',')).join('L') + 'Z').join('');
-  // state outlines first (under), then district cells, then bananas
   const gS = document.createElementNS(NS, 'g'), gC = document.createElementNS(NS, 'g'), gB = document.createElementNS(NS, 'g');
   svg.append(gS, gC, gB);
   for (const s of data.states) { const p = document.createElementNS(NS, 'path'); p.setAttribute('class', 'state'); p.setAttribute('d', pathd(s.rings)); gS.append(p); }
@@ -131,7 +114,6 @@
   const images = new Map(), cells = new Map();
   for (const d of data.districts) {
     const p = document.createElementNS(NS, 'path'); p.setAttribute('class', 'cell'); p.setAttribute('d', pathd(d.rings)); gC.append(p);
-    // banana sized to the district's bounding box
     const xs = d.rings[0].map(q => q[0]), ys = d.rings[0].map(q => q[1]);
     const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
     const sz = Math.min(w, h) * 1.1;
@@ -143,7 +125,7 @@
       const st = stageFor(d.margin);
       const note = d.id.startsWith('MO-') ? '<br><span class="m">* Missouri: 2022 lines, by court order</span>' : '';
       const vac = d.inc.startsWith('VACANT') ? ' (vacant)' : '';
-      pop.innerHTML = `<img src="${img(st, 128)}" alt=""><b>${d.id}</b><span class="m"> · ${d.state}</span><br>${d.inc.replace(/^VACANT \((.*)\)$/, '$1')}${vac} (${d.party})<br><span class="m">2024: ${fmtMargin(d.margin)}</span><br>Stage ${st} of 10, ${SLUGS[st-1]}${note}`;
+      pop.innerHTML = `<img src="${img(st, 128)}" alt=""><b>${d.id}</b><span class="m"> · ${d.state}</span><br>${d.inc.replace(/^VACANT \((.*)\)$/, '$1')}${vac} (${d.party})<br><span class="m">2024: ${fmtMargin(d.margin)}</span><br>Stage ${st} of 10${note}`;
       pop.style.display = 'block'; p.classList.add('active'); move(ev);
     };
     const move = (ev) => {
@@ -162,21 +144,21 @@
   const legend = document.getElementById('legend');
   function render() {
     const counts = new Array(11).fill(0);
-    for (const d of data.districts) { const st = stageFor(d.margin); counts[st]++; const im = images.get(d.id); im.setAttribute('href', img(st, 64)); im.classList.toggle('dim', st > REVEAL); cells.get(d.id).style.pointerEvents = st > REVEAL ? 'none' : ''; }
+    for (const d of data.districts) {
+      const st = stageFor(d.margin); counts[st]++;
+      const im = images.get(d.id); im.setAttribute('href', img(st, 64)); im.classList.toggle('dim', st > REVEAL);
+      cells.get(d.id).style.pointerEvents = st > REVEAL ? 'none' : '';
+    }
     const shown = counts.slice(1, REVEAL + 1).reduce((a, b) => a + b, 0);
-    document.getElementById('revealn').textContent = REVEAL >= 10 ? 'All 435 districts' : `${shown} of 435 districts (stage${REVEAL > 1 ? 's 1 to ' + REVEAL : ' 1'})`;
+    document.getElementById('revealn').textContent = REVEAL >= 10 ? 'All 435 districts' : `${shown} of 435 districts`;
     document.getElementById('revealhint').style.display = REVEAL >= 10 ? 'none' : '';
     document.getElementById('greencount').textContent = counts[1];
     document.getElementById('heroimg').src = img(1, 256);
     legend.innerHTML = '';
-    for (let s = 1; s <= 10; s++) legend.insertAdjacentHTML('beforeend', `<div><img src="${img(s, 64)}" alt="stage ${s}"><div class="n">${counts[s]}</div>${SLUGS[s-1]}</div>`);
-    for (const id of ['capv','capv2','capv3']) document.getElementById(id).textContent = CAP;
+    for (let s = 1; s <= 10; s++) legend.insertAdjacentHTML('beforeend', `<div><img src="${img(s, 128)}" alt="stage ${s}, ${SLUGS[s-1]}"><div class="n">${counts[s]}</div></div>`);
   }
   document.getElementById('reveal').addEventListener('input', e => { REVEAL = +e.target.value; render(); });
-
-  function applyTheme(dark) { root.dataset.theme = dark ? 'dark' : 'light'; theme = dark ? 'dark/' : ''; btn.textContent = dark ? 'light' : 'dark'; render(); }
-  btn.addEventListener('click', () => applyTheme(root.dataset.theme !== 'dark'));
-  applyTheme(theme === 'dark/');
+  render();
 })();
 </script>
 </body>
